@@ -1,4 +1,7 @@
-const BASE_URL = "http://localhost:8081";
+const BASE_URL =
+    window.location.hostname === "localhost"
+        ? "http://localhost:8081"
+        : "https://hrenterprise-saas.onrender.com";
 
 /* =========================
    🔐 AUTH FUNCTIONS
@@ -567,4 +570,7 @@ function loadMyProfile() {
         document.getElementById("myProfile").innerHTML =
             `<p class="empty-state">Could not load profile ❌</p>`;
     });
+}
+function register() {
+    window.location.href = "register.html";
 }
