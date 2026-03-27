@@ -13,4 +13,7 @@ public interface LeaveRepository extends JpaRepository<Leave, Long> {
 
     // ✅ Get all leaves for a company
     List<Leave> findByCompanyId(Long companyId);
+
+    
+    void deleteByAppliedBy(User user);
 }

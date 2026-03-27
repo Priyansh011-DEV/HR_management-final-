@@ -135,29 +135,33 @@ public class EmployeeService {
 
 
 
-
+    @Transactional
     public void deleteEmployee(Long employeeId, String username) {
 
-        // Step 1: get logged-in user
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Step 2: role check
         if (user.getRole() != Role.ADMIN) {
             throw new RuntimeException("Only ADMIN can delete employees");
         }
 
-        // Step 3: fetch employee
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
 
-        // Step 4: company validation
         if (!employee.getCompany().getId().equals(user.getCompany().getId())) {
             throw new RuntimeException("You cannot delete employees from another company");
         }
 
-        // Step 5: delete
-        employeeRepository.delete(employee);
+        // ✅ Delete leaves first, then user, then employee
+        User employeeUser = employee.getUser();
+        if (employeeUser != null) {
+            leaveRepository.deleteByAppliedBy(employeeUser); // add this line
+        }
+
+        employeeRepository.delete(employee); // cascades to user if configured, or:
+        if (employeeUser != null) {
+            userRepository.delete(employeeUser);
+        }
     }
 
 
