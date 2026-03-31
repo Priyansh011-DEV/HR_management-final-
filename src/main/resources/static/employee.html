@@ -1,58 +1,145 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Employee Dashboard</title>
-    <link rel="stylesheet" href="style1.css">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard — HR Enterprise</title>
+    <link rel="stylesheet" href="style1.css">
 </head>
 <body>
 
-<div class="navbar">
-    <h2>Employee Dashboard</h2>
-    <button class="logout-btn" onclick="logout()">Logout</button>
+<div class="bg-layer">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
 </div>
 
-<div class="container">
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-    <!-- MY PROFILE -->
-    <div class="card">
-        <h3>My Profile</h3>
-        <div id="myProfile"><p class="empty-state">Loading profile...</p></div>
-    </div>
+<div class="topbar">
+    <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+        <span></span><span></span><span></span>
+    </button>
+    <span class="topbar-brand">HR Enterprise</span>
+    <div style="width:40px"></div>
+</div>
 
-    <!-- APPLY LEAVE -->
-    <div class="card">
-        <h3>Apply Leave</h3>
+<div class="app-shell">
 
-        <select id="leaveType">
-            <option value="SICK">Sick Leave</option>
-            <option value="CASUAL">Casual Leave</option>
-            <option value="PAID">Paid Leave</option>
-        </select>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">HR Enterprise</div>
+            <div class="sidebar-role-badge badge-employee">Employee</div>
+        </div>
 
-        <input type="date" id="startDate">
-        <input type="date" id="endDate">
-        <input type="text" id="reason" placeholder="Reason">
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">My Space</div>
+            <div class="nav-item active" onclick="showSection('profile', this)">
+                <span class="nav-icon">👤</span> My Profile
+            </div>
+            <div class="nav-item" onclick="showSection('my-leaves', this)">
+                <span class="nav-icon">🏖️</span> My Leaves
+            </div>
+            <div class="nav-item" onclick="showSection('apply-leave', this)">
+                <span class="nav-icon">✍️</span> Apply Leave
+            </div>
+        </nav>
 
-        <button onclick="applyLeave()">Submit</button>
-    </div>
+        <div class="sidebar-footer">
+            <button class="logout-btn" onclick="logout()">
+                <span>🚪</span> Logout
+            </button>
+        </div>
+    </aside>
 
-    <!-- MY LEAVES -->
-    <div class="card">
-        <h3>My Leaves</h3>
-        <button onclick="loadMyLeaves()">Refresh</button>
-        <div id="leaveList"></div>
-    </div>
+    <main class="main-content">
 
+        <!-- PROFILE -->
+        <div class="content-area active" id="section-profile">
+            <div class="page-header">
+                <div class="page-title" id="empGreeting">Good morning</div>
+                <div class="page-subtitle">Here's your profile and activity summary.</div>
+            </div>
+            <div class="card" style="margin: 0 40px;">
+                <h3>My Profile</h3>
+                <div id="myProfile">
+                    <div class="empty-state"><div class="empty-state-icon">👤</div>Loading profile...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MY LEAVES -->
+        <div class="content-area" id="section-my-leaves">
+            <div class="page-header">
+                <div class="page-title">My Leaves</div>
+                <div class="page-subtitle">Track all your leave requests and their status.</div>
+            </div>
+            <div class="card" style="margin: 0 40px;">
+                <h3>Leave History</h3>
+                <div class="data-list" id="leaveList">
+                    <div class="empty-state"><div class="empty-state-icon">🏖️</div>Loading your leaves...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- APPLY LEAVE -->
+        <div class="content-area" id="section-apply-leave">
+            <div class="page-header">
+                <div class="page-title">Apply Leave</div>
+                <div class="page-subtitle">Submit a new leave request for approval.</div>
+            </div>
+            <div class="card" style="margin: 0 40px;">
+                <h3>Leave Application</h3>
+                <div class="form-grid">
+                    <select id="leaveType">
+                        <option value="SICK">Sick Leave</option>
+                        <option value="CASUAL">Casual Leave</option>
+                        <option value="PAID">Paid Leave</option>
+                    </select>
+                    <input type="text" id="reason" placeholder="Reason">
+                    <input type="date" id="startDate">
+                    <input type="date" id="endDate">
+                </div>
+                <button onclick="applyLeave()">✍️ Submit Application</button>
+            </div>
+        </div>
+
+    </main>
 </div>
 
 <script src="app.js"></script>
-<script src="cursor.js"></script>
-
 <script>
     checkAuth();
     loadMyProfile();
-    loadMyLeaves();
+
+    function showSection(id, navEl) {
+        document.querySelectorAll('.content-area').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('section-' + id).classList.add('active');
+        if (navEl) navEl.classList.add('active');
+        closeSidebar();
+
+        if (id === 'my-leaves') loadMyLeaves();
+    }
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const burger  = document.getElementById('hamburger');
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('visible');
+        burger.classList.toggle('open');
+    }
+
+    function closeSidebar() {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('sidebarOverlay').classList.remove('visible');
+        document.getElementById('hamburger').classList.remove('open');
+    }
+
+    const hour = new Date().getHours();
+    const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+    document.getElementById('empGreeting').textContent = greet;
 </script>
 
 </body>

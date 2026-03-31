@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — HR Enterprise</title>
+    <link rel="stylesheet" href="style1.css">
+</head>
+<body>
+
+<!-- Animated Background -->
+<div class="bg-layer">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+</div>
+
+<!-- Sidebar Overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- Mobile Topbar -->
+<div class="topbar">
+    <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+        <span></span><span></span><span></span>
+    </button>
+    <span class="topbar-brand">HR Enterprise</span>
+    <div style="width:40px"></div>
+</div>
+
+<div class="app-shell">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">HR Enterprise</div>
+            <div class="sidebar-role-badge badge-admin">Admin</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Overview</div>
+            <div class="nav-item active" onclick="showSection('overview', this)">
+                <span class="nav-icon">📊</span> Dashboard
+            </div>
+
+            <div class="nav-section-label">People</div>
+            <div class="nav-item" onclick="showSection('employees', this)">
+                <span class="nav-icon">👥</span> Employees
+            </div>
+            <div class="nav-item" onclick="showSection('add-employee', this)">
+                <span class="nav-icon">➕</span> Add Employee
+            </div>
+            <div class="nav-item" onclick="showSection('add-hr', this)">
+                <span class="nav-icon">🧑‍💼</span> Add HR
+            </div>
+
+            <div class="nav-section-label">Leave</div>
+            <div class="nav-item" onclick="showSection('leave-requests', this)">
+                <span class="nav-icon">📋</span> Leave Requests
+            </div>
+            <div class="nav-item" onclick="showSection('my-leaves', this)">
+                <span class="nav-icon">🏖️</span> My Leaves
+            </div>
+            <div class="nav-item" onclick="showSection('apply-leave', this)">
+                <span class="nav-icon">✍️</span> Apply Leave
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="logout-btn" onclick="logout()">
+                <span>🚪</span> Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- OVERVIEW -->
+        <div class="content-area active" id="section-overview">
+            <div class="page-header">
+                <div class="page-title" id="adminGreeting">Good morning, Admin</div>
+                <div class="page-subtitle">Here's what's happening in your company today.</div>
+            </div>
+            <div style="padding: 0 40px; margin-top: 28px;" id="overviewPadding">
+                <div class="stats-row" id="statsRow">
+                    <div class="stat-card" style="--stat-color: var(--accent)">
+                        <div class="stat-value" id="statEmployees">—</div>
+                        <div class="stat-label">Total Employees</div>
+                    </div>
+                    <div class="stat-card" style="--stat-color: var(--amber)">
+                        <div class="stat-value" id="statPending">—</div>
+                        <div class="stat-label">Pending Leaves</div>
+                    </div>
+                    <div class="stat-card" style="--stat-color: var(--green)">
+                        <div class="stat-value" id="statApproved">—</div>
+                        <div class="stat-label">Approved Leaves</div>
+                    </div>
+                    <div class="stat-card" style="--stat-color: var(--accent2)">
+                        <div class="stat-value" id="statHR">—</div>
+                        <div class="stat-label">HR Members</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EMPLOYEES -->
+        <div class="content-area" id="section-employees">
+            <div class="page-header">
+                <div class="page-title">Employees</div>
+                <div class="page-subtitle">Manage all team members in your company.</div>
+            </div>
+            <div class="card" style="margin: 0 40px;">
+                <h3>All Employees</h3>
+                <div class="data-list" id="employees">
+                    <div class="empty-state"><div class="empty-state-icon">👥</div>Loading employees...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADD EMPLOYEE -->
+        <div class="content-area" id="section-add-employee">
+            <div class="page-header">
+                <div class="page-title">Add Employee</div>
+                <div class="page-subtitle">Create a new employee account.</div>
+            </div>
+            <div class="card" style="margin: 0 40px;">
+                <h3>Employee Details</h3>
+                <div class="form-grid">
+                    <input type="text"     id="empName"       placeholder="Full Name">
+                    <input type="email"    id="empEmail"      placeholder="Email Address">
+                    <input type="text"     id="empDepartment" placeholder="Department">
+                    <input type="number"   id="empSalary"     placeholder="Salary (₹)">
+                    <input type="text"     id="empUsername"   placeholder="Username">
+                    <input type="password" id="empPassword"   placeholder="Password">
+                </div>
+                <button onclick="addEmployee('EMPLOYEE')">➕ Add Employee</button>
+            </div>
+        </div>
+
+        <!-- ADD HR -->
+        <div class="content-area" id="section-add-hr">
+            <div class="page-header">
+                <div class="page-title">Add HR</div>
+                <div class="page-subtitle">Create a new HR manager account.</div>
+            </div>
+            <div class="card" style="margin: 0 40px;">
+                <h3>HR Details</h3>
+                <div class="form-grid">
+                    <input type="text"     id="hrName"       placeholder="Full Name">
+                    <input type="email"    id="hrEmail"      placeholder="Email Address">
+                    <input type="text"     id="hrDepartment" placeholder="Department">
+                    <input type="number"   id="hrSalary"     placeholder="Salary (₹)">
+                    <input type="text"     id="hrUsername"   placeholder="Username">
+                    <input type="password" id="hrPassword"   placeholder="Password">
+                </div>
+                <button onclick="addEmployee('HR')">🧑‍💼 Add HR</button>
+            </div>
+        </div>
+
+        <!-- LEAVE REQUESTS -->
+        <div class="content-area" id="section-leave-requests">
+            <div class="page-header">
+                <div class="page-title">Leave Requests</div>
+                <div class="page-subtitle">Review and manage all leave applications.</div>
+            </div>
+            <div class="card" style="margin: 0 40px;">
+                <h3>All Requests</h3>
+                <div class="data-list" id="leaveRequests">
+                    <div class="empty-state"><div class="empty-state-icon">📋</div>Loading leave requests...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MY LEAVES -->
+        <div class="content-area" id="section-my-leaves">
+            <div class="page-header">
+                <div class="page-title">My Leaves</div>
+                <div class="page-subtitle">Your personal leave history.</div>
+            </div>
+            <div class="card" style="margin: 0 40px;">
+                <h3>Leave History</h3>
+                <div class="data-list" id="leaveList">
+                    <div class="empty-state"><div class="empty-state-icon">🏖️</div>Loading your leaves...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- APPLY LEAVE -->
+        <div class="content-area" id="section-apply-leave">
+            <div class="page-header">
+                <div class="page-title">Apply Leave</div>
+                <div class="page-subtitle">Submit a new leave request.</div>
+            </div>
+            <div class="card" style="margin: 0 40px;">
+                <h3>Leave Application</h3>
+                <div class="form-grid">
+                    <select id="leaveType">
+                        <option value="SICK">Sick Leave</option>
+                        <option value="CASUAL">Casual Leave</option>
+                        <option value="PAID">Paid Leave</option>
+                    </select>
+                    <input type="text" id="reason" placeholder="Reason">
+                    <input type="date" id="startDate">
+                    <input type="date" id="endDate">
+                </div>
+                <button onclick="applyLeave()">✍️ Submit Application</button>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script src="app.js"></script>
+<script>
+    checkAuth();
+
+    function showSection(id, navEl) {
+        document.querySelectorAll('.content-area').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('section-' + id).classList.add('active');
+        if (navEl) navEl.classList.add('active');
+        closeSidebar();
+
+        // Lazy load on nav
+        if (id === 'employees')      loadEmployees();
+        if (id === 'leave-requests') loadLeaves();
+        if (id === 'my-leaves')      loadMyLeaves();
+    }
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const burger  = document.getElementById('hamburger');
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('visible');
+        burger.classList.toggle('open');
+    }
+
+    function closeSidebar() {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('sidebarOverlay').classList.remove('visible');
+        document.getElementById('hamburger').classList.remove('open');
+    }
+
+    // Greeting
+    const hour = new Date().getHours();
+    const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+    document.getElementById('adminGreeting').textContent = greet + ', Admin';
+
+    // Load stats on overview
+    Promise.all([
+        fetch(`${BASE_URL}/employees`, { headers: authHeader() }).then(r => r.json()),
+        fetch(`${BASE_URL}/api/leaves/all`, { headers: authHeader() }).then(r => r.json())
+    ]).then(([emps, leaves]) => {
+        document.getElementById('statEmployees').textContent = emps.length;
+        document.getElementById('statPending').textContent   = leaves.filter(l => l.status === 'PENDING').length;
+        document.getElementById('statApproved').textContent  = leaves.filter(l => l.status === 'APPROVED').length;
+        document.getElementById('statHR').textContent        = emps.filter(e => e.user?.role === 'HR').length;
+    }).catch(() => {});
+</script>
+
+</body>
+</html>

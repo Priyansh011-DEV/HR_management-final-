@@ -37,8 +37,10 @@ function login() {
 
         if (roles.includes("EMPLOYEE")) {
             window.location.href = "employee.html";
+        } else if (roles.includes("ADMIN")) {
+            window.location.href = "admin-dashboard.html";
         } else {
-            window.location.href = "dashboard.html"; // ADMIN or HR
+            window.location.href = "hr-dashboard.html"; // HR
         }
     })
     .catch(err => alert("Login failed ❌ " + err.message));
@@ -111,13 +113,21 @@ function checkAuth() {
 
     const page = window.location.pathname;
 
-    if (page.includes("dashboard") && isEmployee()) {
+    // Redirect employees away from admin/hr dashboards
+    if ((page.includes("admin-dashboard") || page.includes("hr-dashboard")) && isEmployee()) {
         window.location.href = "employee.html";
         return;
     }
 
-    if (page.includes("employee") && !isEmployee()) {
-        window.location.href = "dashboard.html";
+    // Redirect non-employees away from employee dashboard
+    if (page.includes("employee.html") && !isEmployee()) {
+        window.location.href = isAdmin() ? "admin-dashboard.html" : "hr-dashboard.html";
+        return;
+    }
+
+    // Redirect HR away from admin dashboard
+    if (page.includes("admin-dashboard") && !isAdmin()) {
+        window.location.href = "hr-dashboard.html";
         return;
     }
 }
@@ -217,7 +227,38 @@ function loadMyProfile() {
         return res.json();
     })
     .then(emp => {
-        container.innerHTML = profileCardHTML(emp);
+        const initial = emp.name?.charAt(0).toUpperCase() || '?';
+        container.innerHTML = `
+        <div style="display:flex; align-items:center; gap:16px; margin-bottom:20px">
+            <div style="width:56px; height:56px; border-radius:50%;
+                background: linear-gradient(135deg, var(--accent), var(--accent2));
+                display:flex; align-items:center; justify-content:center;
+                font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:#080c14; flex-shrink:0">
+                ${initial}
+            </div>
+            <div>
+                <div style="font-size:20px; font-weight:600; color:var(--text)">${emp.name}</div>
+                <div style="font-size:13px; color:var(--text-muted); margin-top:2px">${emp.email}</div>
+            </div>
+        </div>
+        <div class="profile-grid">
+            <div class="profile-field">
+                <div class="profile-field-label">Department</div>
+                <div class="profile-field-value">${emp.department || '—'}</div>
+            </div>
+            <div class="profile-field">
+                <div class="profile-field-label">Salary</div>
+                <div class="profile-field-value" style="color:var(--green)">₹${emp.salary?.toLocaleString('en-IN') || '—'}</div>
+            </div>
+            <div class="profile-field">
+                <div class="profile-field-label">Role</div>
+                <div class="profile-field-value" style="color:var(--accent2)">${emp.user?.role || '—'}</div>
+            </div>
+            <div class="profile-field">
+                <div class="profile-field-label">Company</div>
+                <div class="profile-field-value">${emp.company?.name || '—'}</div>
+            </div>
+        </div>`;
     })
     .catch(() => {
         container.innerHTML = `<p class="empty-state">Profile not found ❌</p>`;
@@ -320,26 +361,32 @@ function loadEmployees() {
         }
 
         const admin = isAdmin();
-        const hr    = isHR();
-
+        // HR cannot delete — only ADMIN can
         container.innerHTML = data.map(emp => {
-            const empRole    = emp.user?.role || "EMPLOYEE";
-            const showRemove = admin || (hr && empRole === "EMPLOYEE");
+            const empRole = emp.user?.role || "EMPLOYEE";
+            const roleClass = empRole === "ADMIN" ? "role-tag role-tag-admin" : "role-tag";
+            const initial = emp.name?.charAt(0).toUpperCase() || '?';
 
             return `
-            <div class="card">
-                <p><b>${emp.name}</b>
-                   <span class="role-tag">${empRole}</span>
-                </p>
-                <p>📧 ${emp.email}</p>
-                <p>🏢 ${emp.department}</p>
-                <p>💰 ₹${emp.salary?.toLocaleString('en-IN') || '—'}</p>
-                ${showRemove ? `
-                    <button onclick="removeEmployee(${emp.id}, '${empRole}')"
-                            style="background:linear-gradient(135deg,#ef4444,#dc2626); margin-top:8px">
-                        ❌ Remove
-                    </button>
-                ` : ""}
+            <div class="data-item">
+                <div class="data-item-header">
+                    <div style="display:flex; align-items:center; gap:12px">
+                        <div class="emp-avatar">${initial}</div>
+                        <div>
+                            <div class="data-item-name">${emp.name}</div>
+                            <div style="margin-top:2px"><span class="${roleClass}">${empRole}</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="data-item-meta">
+                    <span>📧 ${emp.email}</span>
+                    <span>🏢 ${emp.department}</span>
+                    <span>💰 ₹${emp.salary?.toLocaleString('en-IN') || '—'}</span>
+                </div>
+                ${admin ? `
+                <div class="data-item-actions">
+                    <button class="btn-danger btn-sm" onclick="removeEmployee(${emp.id}, '${empRole}')">🗑 Remove</button>
+                </div>` : ''}
             </div>`;
         }).join("");
     })
@@ -371,28 +418,31 @@ function loadLeaves() {
         const hr    = isHR();
 
         container.innerHTML = data.map(l => {
-            const color = getStatusColor(l.status);
-
+            const statusClass = l.status === 'APPROVED' ? 'badge-approved' : l.status === 'REJECTED' ? 'badge-rejected' : 'badge-pending';
             let showButtons = false;
             if (l.status === "PENDING") {
-                if (admin) showButtons = true; // admin approves ALL including own
-                if (hr && l.employeeRole === "EMPLOYEE") showButtons = true; // HR approves EMPLOYEE only
+                if (admin) showButtons = true;
+                if (hr && l.employeeRole === "EMPLOYEE") showButtons = true;
             }
 
             return `
-            <div class="card">
-                <p><b>${l.employeeName}</b>
-                   <span class="role-tag">${l.employeeRole}</span>
-                </p>
-                <p>${l.leaveType} &nbsp;|&nbsp; ${l.startDate} → ${l.endDate}</p>
-                <p>Status: <span style="color:${color}; font-weight:600">${l.status}</span></p>
+            <div class="data-item">
+                <div class="data-item-header">
+                    <div>
+                        <div class="data-item-name">${l.employeeName} <span class="role-tag">${l.employeeRole}</span></div>
+                        <div class="data-item-meta" style="margin-top:6px">
+                            <span>${l.leaveType}</span>
+                            <span>📅 ${l.startDate} → ${l.endDate}</span>
+                            ${l.reason ? `<span>💬 ${l.reason}</span>` : ''}
+                        </div>
+                    </div>
+                    <span class="badge ${statusClass}">${l.status}</span>
+                </div>
                 ${showButtons ? `
+                <div class="data-item-actions">
                     <button onclick="approveLeave(${l.id})">✅ Approve</button>
-                    <button onclick="rejectLeave(${l.id})"
-                            style="background:linear-gradient(135deg,#ef4444,#dc2626)">
-                        ❌ Reject
-                    </button>
-                ` : ""}
+                    <button class="btn-danger btn-sm" onclick="rejectLeave(${l.id})">❌ Reject</button>
+                </div>` : ''}
             </div>`;
         }).join("");
     })
@@ -488,12 +538,18 @@ function loadMyLeaves() {
         }
 
         container.innerHTML = data.map(l => {
-            const color = getStatusColor(l.status);
+            const statusClass = l.status === 'APPROVED' ? 'badge-approved' : l.status === 'REJECTED' ? 'badge-rejected' : 'badge-pending';
             return `
-            <div class="card">
-                <p><b>${l.leaveType}</b></p>
-                <p>${l.startDate} → ${l.endDate}</p>
-                <p>Status: <span style="color:${color}; font-weight:600">${l.status}</span></p>
+            <div class="data-item">
+                <div class="data-item-header">
+                    <div>
+                        <div class="data-item-name">${l.leaveType}</div>
+                        <div class="data-item-meta" style="margin-top:4px">
+                            <span>📅 ${l.startDate} → ${l.endDate}</span>
+                        </div>
+                    </div>
+                    <span class="badge ${statusClass}">${l.status}</span>
+                </div>
             </div>`;
         }).join("");
     })
