@@ -2,28 +2,88 @@
 <html>
 <head>
     <title>Register — HR Enterprise</title>
-    <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<div class="register-container">
-    <h2>HR Enterprise</h2>
-    <p>Create your company workspace</p>
+<div class="auth-wrapper">
 
-    <input type="text"     id="companyName"  placeholder="Company Name">
-    <input type="email"    id="companyEmail" placeholder="Company Email">
-    <input type="text"     id="username"     placeholder="Admin Username">
-    <input type="password" id="password"     placeholder="Password">
-
-    <button onclick="register()">Create Workspace</button>
-
-    <div class="auth-footer">
-        Already have an account? <a href="login.html">Sign in</a>
+    <!-- LEFT PANEL -->
+    <div class="auth-left">
+        <div class="auth-left-content">
+            <h1>
+                Build Your Workspace — <span class="typing"></span>
+            </h1>
+            <p>
+                Set up your company, onboard your team, and streamline HR operations
+                with a system designed for growth and efficiency.
+            </p>
+        </div>
     </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="auth-right">
+        <div class="register-container">
+
+            <h2>Create Account</h2>
+            <p>Start your company workspace</p>
+
+            <input type="text"     id="companyName"  placeholder="Company Name">
+            <input type="email"    id="companyEmail" placeholder="Company Email">
+            <input type="text"     id="username"     placeholder="Admin Username">
+            <input type="password" id="password"     placeholder="Password">
+
+            <button onclick="register()">Create Workspace</button>
+
+            <div class="auth-footer">
+                Already have an account?
+                <a href="login.html">Sign in</a>
+            </div>
+
+        </div>
+    </div>
+
 </div>
 
 <script src="app.js"></script>
-<script src="cursor.js"></script>
+
+<!-- Typing Effect -->
+<script>
+    const texts = [
+        "Launch your HR system",
+        "Manage teams effortlessly",
+        "Built for scalability",
+        "Everything in one platform"
+    ];
+
+    let i = 0, j = 0;
+    let isDeleting = false;
+    const el = document.querySelector(".typing");
+
+    function type() {
+        const current = texts[i];
+
+        if (!isDeleting) {
+            el.textContent = current.substring(0, j++);
+            if (j > current.length) {
+                isDeleting = true;
+                setTimeout(type, 1200);
+                return;
+            }
+        } else {
+            el.textContent = current.substring(0, j--);
+            if (j === 0) {
+                isDeleting = false;
+                i = (i + 1) % texts.length;
+            }
+        }
+
+        setTimeout(type, isDeleting ? 40 : 70);
+    }
+    type();
+</script>
+
 </body>
 </html>

@@ -2,26 +2,86 @@
 <html>
 <head>
     <title>Login — HR Enterprise</title>
-    <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<div class="login-container">
-    <h2>HR Enterprise</h2>
-    <p>Sign in to your workspace</p>
+<div class="auth-wrapper">
 
-    <input type="text" id="username" placeholder="Username">
-    <input type="password" id="password" placeholder="Password">
-
-    <button onclick="login()">Sign In</button>
-
-    <div class="auth-footer">
-        Don't have an account? <a href="register.html">Register</a>
+    <!-- LEFT PANEL -->
+    <div class="auth-left">
+        <div class="auth-left-content">
+            <h1>
+                HR Enterprise — <span class="typing"></span>
+            </h1>
+            <p>
+                Manage employees, payroll, and operations from a single platform.
+                Built for modern organizations that scale with clarity and control.
+            </p>
+        </div>
     </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="auth-right">
+        <div class="login-container">
+
+            <h2>Welcome back</h2>
+            <p>Sign in to your workspace</p>
+
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+
+            <button onclick="login()">Sign In</button>
+
+            <div class="auth-footer">
+                Don’t have an account?
+                <a href="register.html">Register</a>
+            </div>
+
+        </div>
+    </div>
+
 </div>
 
 <script src="app.js"></script>
-<script src="cursor.js"></script>
+
+<!-- Typing Effect -->
+<script>
+    const texts = [
+        "Your one stop solution",
+        "Manage everything in one place",
+        "Built for modern teams",
+        "Scale your workforce effortlessly"
+    ];
+
+    let i = 0, j = 0;
+    let isDeleting = false;
+    const el = document.querySelector(".typing");
+
+    function type() {
+        const current = texts[i];
+
+        if (!isDeleting) {
+            el.textContent = current.substring(0, j++);
+            if (j > current.length) {
+                isDeleting = true;
+                setTimeout(type, 1200);
+                return;
+            }
+        } else {
+            el.textContent = current.substring(0, j--);
+            if (j === 0) {
+                isDeleting = false;
+                i = (i + 1) % texts.length;
+            }
+        }
+
+        setTimeout(type, isDeleting ? 40 : 70);
+    }
+    type();
+</script>
+
 </body>
 </html>
