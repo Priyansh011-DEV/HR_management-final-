@@ -181,6 +181,7 @@
 <script src="app.js"></script>
 <script>
     checkAuth();
+    initMobileTouch(); // ← add this
 
     function showSection(id, navEl) {
         document.querySelectorAll('.content-area').forEach(s => s.classList.remove('active'));

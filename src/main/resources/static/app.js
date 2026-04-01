@@ -555,3 +555,11 @@ function loadMyLeaves() {
     })
     .catch(err => alert("Failed to load leaves ❌ " + err.message));
 }
+function initMobileTouch() {
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            this.click();
+        });
+    });
+}

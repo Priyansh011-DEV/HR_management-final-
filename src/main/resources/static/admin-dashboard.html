@@ -213,6 +213,7 @@
 <script src="app.js"></script>
 <script>
     checkAuth();
+    initMobileTouch(); // ← add this
 
     function showSection(id, navEl) {
         document.querySelectorAll('.content-area').forEach(s => s.classList.remove('active'));
@@ -257,6 +258,8 @@
         document.getElementById('statApproved').textContent  = leaves.filter(l => l.status === 'APPROVED').length;
         document.getElementById('statHR').textContent        = emps.filter(e => e.user?.role === 'HR').length;
     }).catch(() => {});
+
+
 </script>
 
 </body>

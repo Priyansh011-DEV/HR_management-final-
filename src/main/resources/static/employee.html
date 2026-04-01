@@ -110,6 +110,7 @@
 <script src="app.js"></script>
 <script>
     checkAuth();
+    initMobileTouch(); // ← add this
     loadMyProfile();
 
     function showSection(id, navEl) {
@@ -140,6 +141,8 @@
     const hour = new Date().getHours();
     const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
     document.getElementById('empGreeting').textContent = greet;
+
+
 </script>
 
 </body>
