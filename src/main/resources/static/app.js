@@ -103,10 +103,18 @@ function isEmployee() { return getRoles().includes("EMPLOYEE"); }
 // 🔒 PAGE PROTECTION
 // =========================
 
+function isTokenExpired(token) {
+    try {
+        const exp = parseJwt(token).exp;
+        return !exp || Date.now() / 1000 > exp;
+    } catch { return true; }
+}
+
 function checkAuth() {
     const token = localStorage.getItem("token");
 
-    if (!token) {
+    if (!token || isTokenExpired(token)) {
+        localStorage.removeItem("token");
         window.location.href = "login.html";
         return;
     }
