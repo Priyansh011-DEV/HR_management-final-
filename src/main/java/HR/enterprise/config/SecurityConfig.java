@@ -49,19 +49,19 @@ public class SecurityConfig {
                         //Permit ALL files
                         .requestMatchers("/*.css", "/*.js", "/*.html", "/static/**").permitAll()
 
-                        // 🔐 Employee module
+                        //  Employee module
                         .requestMatchers(HttpMethod.POST, "/employees").hasAnyRole("ADMIN","HR")
                         .requestMatchers(HttpMethod.GET, "/employees/**").hasAnyRole("ADMIN", "HR", "EMPLOYEE")
                         .requestMatchers(HttpMethod.PUT, "/employees/**").hasAnyRole("ADMIN", "HR", "EMPLOYEE")
                         .requestMatchers(HttpMethod.DELETE, "/employees/**").hasRole("ADMIN")
 
-                        // 🏖️ Leave module
+                        // Leave module
                         .requestMatchers(HttpMethod.POST, "/api/leaves/apply").hasAnyRole("ADMIN", "HR", "EMPLOYEE")
                         .requestMatchers(HttpMethod.GET, "/api/leaves/my").hasAnyRole("ADMIN", "HR", "EMPLOYEE")
                         .requestMatchers(HttpMethod.GET, "/api/leaves/all").hasAnyRole("ADMIN", "HR")
                         .requestMatchers(HttpMethod.PUT, "/api/leaves/**").hasAnyRole("ADMIN", "HR")
 
-                        // 🔒 Everything else
+                        // Everything else
                         .anyRequest().authenticated()
                 )
 
