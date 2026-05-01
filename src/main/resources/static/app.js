@@ -74,8 +74,9 @@ function register() {
 }
 
 function logout() {
-    localStorage.removeItem("token");
-    window.location.href = "login.html";
+    localStorage.clear();
+    sessionStorage.removeItem("fromIndex");
+    window.location.href = "index.html";
 }
 
 // =========================
